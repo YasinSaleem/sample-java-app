@@ -1,0 +1,86 @@
+---
+- name: Post-Installation Jenkins Configuration
+  hosts: jenkins
+  become: yes
+  gather_facts: yes
+  
+  tasks:
+    - name: Ensure Jenkins service is running
+      systemd:
+        name: jenkins
+        state: started
+        enabled: yes
+        
+    - name: Verify Java installation
+      command: java -version
+      register: java_version
+      
+    - name: Display Java version
+      debug:
+        msg: "Java version: {{ java_version.stderr_lines[0] }}"
+        
+    - name: Verify Maven installation
+      command: mvn --version
+      register: maven_version
+      
+    - name: Display Maven version
+      debug:
+        msg: "Maven version: {{ maven_version.stdout_lines[0] }}"
+        
+    - name: Verify Docker installation
+      command: docker --version
+      register: docker_version
+      
+    - name: Display Docker version
+      debug:
+        msg: "Docker version: {{ docker_version.stdout }}"
+        
+    - name: Verify AWS CLI installation
+      command: aws --version
+      register: aws_version
+      
+    - name: Display AWS CLI version
+      debug:
+        msg: "AWS CLI version: {{ aws_version.stdout }}"
+        
+    - name: Check Jenkins process
+      command: pgrep -f jenkins
+      register: jenkins_process
+      
+    - name: Confirm Jenkins is running
+      debug:
+        msg: "Jenkins is running with PID: {{ jenkins_process.stdout }}"
+        
+    - name: Create backup directory for Jenkins
+      file:
+        path: /var/lib/jenkins/backups
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: '0755'
+        
+    - name: Install additional useful packages
+      package:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - tree
+        - htop
+        - vim
+        
+    - name: Display completion message
+      debug:
+        msg: |
+          ✅ Configuration Management with Ansible Complete!
+          
+          Services Verified:
+          - Jenkins: Running ✅
+          - Java: {{ java_version.stderr_lines[0] }} ✅
+          - Maven: Installed ✅
+          - Docker: {{ docker_version.stdout }} ✅
+          - AWS CLI: Installed ✅
+          
+          Additional tools installed:
+          - tree, htop, vim
+          
+          Jenkins accessible at: http://{{ ansible_default_ipv4.address }}:8080
