@@ -132,7 +132,7 @@ pipeline {
             emailext(
                 subject: "✅ Build Success: ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
                 body: "The build was successful. Application deployed to EKS cluster.",
-                to: "developer@company.com"
+                to: "yasinkoppara@gmail.com"
             )
         }
         failure {
@@ -140,7 +140,7 @@ pipeline {
             emailext(
                 subject: "❌ Build Failed: ${env.JOB_NAME} - ${env.BUILD_NUMBER}",
                 body: "The build failed. Please check the logs.",
-                to: "developer@company.com"
+                to: "yasinkoppara@gmail.com"
             )
         }
     }
