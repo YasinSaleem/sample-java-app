@@ -70,7 +70,7 @@ Payload URL: http://35.91.0.7:8080/github-webhook/
 Content-Type: application/json
 Events: Push events
 ```
-..
+.
 ### **Step 4: Test Complete Pipeline**
 1. **Manual Pipeline Trigger:**
    - Run pipeline job in Jenkins
