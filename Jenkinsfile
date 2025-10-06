@@ -1,6 +1,10 @@
 pipeline {
     agent any
     
+    triggers {
+        githubPush()
+    }
+    
     environment {
         AWS_REGION = 'us-west-2'
         ECR_REGISTRY = '043031296302.dkr.ecr.us-west-2.amazonaws.com'
