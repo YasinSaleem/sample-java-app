@@ -1,10 +1,6 @@
 pipeline {
     agent any
     
-    tools {
-        maven 'Maven-3.8.6'
-    }
-    
     environment {
         AWS_REGION = 'us-west-2'
         ECR_REGISTRY = '043031296302.dkr.ecr.us-west-2.amazonaws.com'
@@ -23,7 +19,12 @@ pipeline {
         
         stage('Build with Maven') {
             steps {
-                sh 'mvn clean compile test package'
+                sh '''
+                    echo "Checking Maven installation..."
+                    mvn --version
+                    echo "Starting Maven build..."
+                    mvn clean compile test package
+                '''
                 echo 'Maven build completed'
             }
             post {
