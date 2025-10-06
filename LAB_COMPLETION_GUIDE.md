@@ -58,7 +58,7 @@ http://35.91.0.7:8080
    - Repository: `https://github.com/YasinSaleem/sample-java-app`
    - Branch: `*/main`
    - Script Path: `Jenkinsfile`
-
+.
 2. **Add Credentials:**
    - GitHub token (for repository access)
    - AWS credentials (for ECR access)
