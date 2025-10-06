@@ -29,8 +29,16 @@ pipeline {
             }
             post {
                 always {
-                    junit 'target/surefire-reports/*.xml'
-                    archiveArtifacts 'target/*.jar'
+                    script {
+                        // Only process test reports if they exist
+                        if (fileExists('target/surefire-reports')) {
+                            junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
+                        }
+                        // Archive JAR files if they exist
+                        if (fileExists('target')) {
+                            archiveArtifacts artifacts: 'target/*.jar', allowEmptyArchive: true
+                        }
+                    }
                 }
             }
         }
