@@ -1,0 +1,6 @@
+[jenkins]
+# Jenkins server IP from Terraform output
+jenkins-server ansible_host=35.91.0.7 ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/id_rsa
+
+[jenkins:vars]
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'

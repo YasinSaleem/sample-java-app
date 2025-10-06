@@ -1,0 +1,131 @@
+---
+- name: Configure Jenkins Server
+  hosts: jenkins
+  become: yes
+  gather_facts: yes
+  
+  vars:
+    jenkins_user: jenkins
+    maven_version: "3.8.6"
+    maven_home: "/opt/maven"
+    
+  tasks:
+    - name: Wait for Jenkins to be ready
+      wait_for:
+        port: 8080
+        host: "{{ ansible_default_ipv4.address }}"
+        delay: 30
+        timeout: 300
+      
+    - name: Get Jenkins initial admin password
+      slurp:
+        src: /var/lib/jenkins/secrets/initialAdminPassword
+      register: jenkins_password
+      
+    - name: Display Jenkins password
+      debug:
+        msg: "Jenkins Initial Admin Password: {{ jenkins_password.content | b64decode }}"
+        
+    - name: Install Jenkins CLI
+      get_url:
+        url: "http://localhost:8080/jnlpJars/jenkins-cli.jar"
+        dest: /tmp/jenkins-cli.jar
+        mode: '0755'
+      retries: 5
+      delay: 30
+      
+    - name: Create Jenkins plugins list
+      copy:
+        content: |
+          git
+          maven-plugin
+          docker-plugin
+          kubernetes-cli
+          pipeline-stage-view
+          blueocean
+          github
+          aws-credentials
+          amazon-ecr
+          kubernetes
+        dest: /tmp/plugins.txt
+        
+    - name: Install Jenkins plugins using CLI
+      shell: |
+        java -jar /tmp/jenkins-cli.jar -s http://localhost:8080/ -auth admin:{{ jenkins_password.content | b64decode }} install-plugin {{ item }} -restart
+      loop:
+        - git
+        - maven-plugin  
+        - docker-plugin
+        - kubernetes-cli
+        - pipeline-stage-view
+        - blueocean
+        - github
+        - aws-credentials
+        - amazon-ecr
+        - kubernetes
+      ignore_errors: yes
+      
+    - name: Configure Maven in Jenkins
+      copy:
+        content: |
+          <?xml version='1.1' encoding='UTF-8'?>
+          <hudson.tasks.Maven_-DescriptorImpl>
+            <installations>
+              <hudson.tasks.Maven_-MavenInstallation>
+                <name>Maven-{{ maven_version }}</name>
+                <home>{{ maven_home }}</home>
+                <properties/>
+              </hudson.tasks.Maven_-MavenInstallation>
+            </installations>
+          </hudson.tasks.Maven_-DescriptorImpl>
+        dest: /var/lib/jenkins/hudson.tasks.Maven.xml
+        owner: jenkins
+        group: jenkins
+        mode: '0644'
+        
+    - name: Create Jenkins AWS credentials directory
+      file:
+        path: /var/lib/jenkins/credentials
+        state: directory
+        owner: jenkins
+        group: jenkins
+        mode: '0755'
+        
+    - name: Configure AWS CLI for Jenkins user
+      become_user: jenkins
+      shell: |
+        aws configure set region us-west-2
+        aws configure set output json
+      
+    - name: Add Jenkins user to docker group (if not already done)
+      user:
+        name: jenkins
+        groups: docker
+        append: yes
+        
+    - name: Restart Jenkins service
+      systemd:
+        name: jenkins
+        state: restarted
+        enabled: yes
+        
+    - name: Wait for Jenkins to restart
+      wait_for:
+        port: 8080
+        host: "{{ ansible_default_ipv4.address }}"
+        delay: 30
+        timeout: 300
+        
+    - name: Display Jenkins access information
+      debug:
+        msg: |
+          Jenkins is ready!
+          URL: http://{{ ansible_default_ipv4.address }}:8080
+          Username: admin
+          Password: {{ jenkins_password.content | b64decode }}
+          
+          Next steps:
+          1. Access Jenkins at the URL above
+          2. Install suggested plugins or use the provided plugin list
+          3. Create your first pipeline job
+          4. Configure GitHub webhook for automatic builds

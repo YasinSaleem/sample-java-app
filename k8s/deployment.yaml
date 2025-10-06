@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-java-app
+  labels:
+    app: sample-java-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: sample-java-app
+  template:
+    metadata:
+      labels:
+        app: sample-java-app
+    spec:
+      imagePullSecrets:
+      - name: ecr-secret
+      containers:
+      - name: sample-java-app
+        image: 043031296302.dkr.ecr.us-west-2.amazonaws.com/sample-java-app-repo:v1.1
+        ports:
+        - containerPort: 8080
+        env:
+        - name: JAVA_OPTS
+          value: "-Xmx512m -Xms256m"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 60
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+---

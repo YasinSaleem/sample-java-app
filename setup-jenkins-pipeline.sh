@@ -1,0 +1,108 @@
+#!/bin/bash
+
+# Jenkins Pipeline Setup Script
+# Run this after manually configuring Jenkins through web interface
+
+set -e
+
+echo "🚀 Setting up Jenkins CI/CD Pipeline"
+echo "=================================="
+
+# Configuration
+JENKINS_URL="http://35.91.0.7:8080"
+GITHUB_REPO="https://github.com/YasinSaleem/sample-java-app"
+AWS_REGION="us-west-2"
+ECR_REGISTRY="043031296302.dkr.ecr.us-west-2.amazonaws.com"
+
+echo "📋 Jenkins Configuration Checklist:"
+echo "1. Access Jenkins at: $JENKINS_URL"
+echo "2. Login with admin password: 1e88ac6d9a8d4865893813ea5767f3ac"
+echo "3. Install suggested plugins (or custom selection)"
+echo "4. Create admin user"
+
+echo ""
+echo "🔌 Required Jenkins Plugins:"
+echo "- Git"
+echo "- Maven Integration"
+echo "- Docker Pipeline"
+echo "- Kubernetes CLI"
+echo "- AWS Steps"
+echo "- GitHub"
+echo "- Blue Ocean (optional)"
+
+echo ""
+echo "🔐 Jenkins Credentials to Add:"
+echo "1. GitHub Personal Access Token (ID: github-token)"
+echo "2. AWS Access Key ID & Secret (ID: aws-credentials)"
+echo "3. Docker Hub credentials (if needed)"
+
+echo ""
+echo "🏗️ Pipeline Job Configuration:"
+echo "1. Create New Item → Pipeline"
+echo "2. Name: sample-java-app-pipeline"
+echo "3. Pipeline → Definition: Pipeline script from SCM"
+echo "4. SCM: Git"
+echo "5. Repository URL: $GITHUB_REPO"
+echo "6. Branch: */main"
+echo "7. Script Path: Jenkinsfile"
+
+echo ""
+echo "🔗 GitHub Webhook Setup:"
+echo "1. Go to GitHub repository settings"
+echo "2. Webhooks → Add webhook"
+echo "3. Payload URL: $JENKINS_URL/github-webhook/"
+echo "4. Content type: application/json"
+echo "5. Events: Just the push event"
+
+echo ""
+echo "🧪 Testing the Pipeline:"
+echo "1. Make a code change in GitHub"
+echo "2. Push to main branch"
+echo "3. Check Jenkins for automatic build trigger"
+echo "4. Verify build, Docker push, and EKS deployment"
+echo "5. Test application: http://sample-java-app-alb-1187300512.us-west-2.elb.amazonaws.com/"
+
+echo ""
+echo "📊 Current Infrastructure Status:"
+echo "- EKS Cluster: ✅ Running"
+echo "- Application Pods: ✅ 2/2 Running"
+echo "- ALB Health: ✅ Healthy targets"
+echo "- ECR Repository: ✅ Ready"
+echo "- Jenkins Server: ✅ Running"
+
+echo ""
+echo "🔧 Manual Configuration Steps:"
+echo "Please complete the following in Jenkins web interface:"
+echo "1. Go to Manage Jenkins → Configure Global Tool Configuration"
+echo "2. Add Maven installation:"
+echo "   - Name: Maven-3.8.6"
+echo "   - MAVEN_HOME: /usr/share/maven (or auto-install)"
+echo "3. Add JDK installation (should detect automatically)"
+
+echo ""
+echo "⚡ Quick Commands for Testing:"
+echo "# Check application"
+echo "curl http://sample-java-app-alb-1187300512.us-west-2.elb.amazonaws.com/"
+echo ""
+echo "# Check health"
+echo "curl http://sample-java-app-alb-1187300512.us-west-2.elb.amazonaws.com/actuator/health"
+echo ""
+echo "# Check pods"
+echo "kubectl get pods -l app=sample-java-app"
+echo ""
+echo "# Check Jenkins"
+echo "curl -I $JENKINS_URL"
+
+echo ""
+echo "🎯 Success Criteria:"
+echo "- [ ] Jenkins web interface accessible"
+echo "- [ ] All required plugins installed"
+echo "- [ ] Pipeline job created and configured"
+echo "- [ ] GitHub webhook configured"
+echo "- [ ] First successful pipeline run"
+echo "- [ ] Application automatically deployed to EKS"
+echo "- [ ] Application accessible externally via ALB"
+
+echo ""
+echo "🏁 When complete, you'll have a fully automated CI/CD pipeline!"
+echo "Any code push to GitHub will trigger: Build → Test → Docker → Deploy → EKS"

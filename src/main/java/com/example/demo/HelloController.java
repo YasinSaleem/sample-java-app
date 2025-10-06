@@ -9,4 +9,14 @@ public class HelloController {
   public String hello() {
     return "Hello from EKS!";
   }
+  
+  @GetMapping("/version")
+  public String version() {
+    return "Sample Java App v1.1 - CI/CD Pipeline Ready!";
+  }
+  
+  @GetMapping("/health-simple")
+  public String healthCheck() {
+    return "Application is running successfully on Kubernetes!";
+  }
 }
