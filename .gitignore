@@ -1,0 +1,38 @@
+# Compiled class files
+*.class
+target/
+
+# Log files
+*.log
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Mac files
+.DS_Store
+
+# Terraform files (these should not be committed)
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/.terraform.tfstate.lock.info
+
+# Docker
+.dockerignore
+
+# AWS credentials
+.aws/
+
+# Build artifacts
+*.jar
+*.war
+
+# Node modules (if any)
+node_modules/
+
+# Environment files
+.env
+.env.local
